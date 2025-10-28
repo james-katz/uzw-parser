@@ -16,17 +16,25 @@ This project is currently in its prototype stage and supports partial parsing of
 
 ## How to Run
 
+### CLI Overview
+
+The CLI lets you either derive a new wallet from a seed phrase or convert an existing ZecWallet Lite database into the YWallet format.
+
 ```bash
-cargo run
+# Generate a wallet from a seed phrase (defaults to 1 derived address)
+cargo run -p cli -- --from-seed "seed words here" --num-addresses 3 --output-file custom.db
+
+# Convert an existing ZecWallet Lite file
+cargo run -p cli -- --from-path ./zecwallet-light-wallet.dat --output-file generated_from_zwl.db
 ```
 
-This command parses the example wallet files included in the project and prints the output to `stdout`. **Note:** The CLI functionality is minimal and not user-interactive at this stage.
+When the conversion succeeds, the wallet is saved as a YWallet database (default: `generated_from_zwl.db`).
 
 ---
 
 ## Principles
 
-The primary goal of this project is to enable seamless and lossless migration of wallet data across different wallet implementations. By reading a wallet file and exporting it into a standardized Rust struct, `zw-parser` ensures compatibility and ease of future development.
+The primary goal of this project is to enable seamless and lossless migration of wallet data across different wallet implementations. By reading a wallet file and exporting it into a standardized Rust struct, `zwl-parser` ensures compatibility and ease of future development.
 
 ### Core Structs
 
@@ -59,14 +67,12 @@ pub struct WalletAccount {
 
 ## Current Limitations
 
-1. **CLI Functionality**: The CLI is not fully interactive. It simply parses example wallet files and prints the results.
-
-2. **ZecWallet Lite Support**:
+1. **ZecWallet Lite Support**:
 
    - Only supports wallet version 25 (latest).
    - Parsing is incomplete; seed and keys are extracted, but account birthday is not yet implemented.
 
-3. **File Documentation**: Refer to the following source files for detailed wallet file structure documentation:
+2. **File Documentation**: Refer to the following source files for detailed wallet file structure documentation:
 
    - `src/zwl.rs` for ZecWallet Lite.
    - `src/ywallet.rs` for YWallet.
@@ -85,4 +91,3 @@ pub struct WalletAccount {
 ## Contributing
 
 Contributions are welcome! Feel free to open issues, suggest features, or submit pull requests.
-

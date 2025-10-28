@@ -208,8 +208,7 @@ impl ZecWalletLite {
     pub fn from_seed_phrase(phrase: &str, num_addr: u32) -> io::Result<crate::Wallet> {
         let mnemonic = <Mnemonic<English>>::from_phrase(phrase).expect("Invalid mnemonic phrase");
         let seed = mnemonic.to_seed("");
-
-        
+        let entropy: &[u8] = mnemonic.entropy();
 
         let mut accounts = vec![];
 
@@ -218,17 +217,19 @@ impl ZecWalletLite {
             // derive extsk
             let extsk = ExtendedSpendingKey::master(&seed);
 
-            let (_,addr) = extsk.clone()
+            let derivedsk = extsk.clone()
                 .derive_child(ChildIndex::hardened(32))
                 .derive_child(ChildIndex::hardened(133))
-                .derive_child(ChildIndex::hardened(hdkey_num))
-                .default_address();
+                .derive_child(ChildIndex::hardened(hdkey_num));
+                
+            let (_, addr) = derivedsk.default_address();
 
-            let fvk = extsk.to_extended_full_viewing_key();
+            let fvk= derivedsk.to_extended_full_viewing_key();
+
             let z_address = encode_payment_address(HRP_SAPLING_PAYMENT_ADDRESS, &addr);
 
             let zkeys = crate::WalletZKey {
-                extsk: Some(extsk),
+                extsk: Some(derivedsk),
                 fvk,
                 key_type: crate::WalletKeyType::HdDerived,
                 index: hdkey_num,
@@ -275,7 +276,7 @@ impl ZecWalletLite {
 
             accounts.push(crate::WalletAccount {
                 name: format!("Account {}", hdkey_num + 1),
-                seed: Some(seed.to_vec()),
+                seed: Some(entropy.to_vec()),
                 birthday: BlockHeight::from_u32(0),
                 keys: crate::WalletKeys {
                     tkeys: Some(tkeys),

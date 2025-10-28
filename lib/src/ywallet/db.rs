@@ -525,7 +525,7 @@ pub fn init_db(conn: &Connection) -> std::io::Result<()> {
     Ok(())
 }
 
-pub fn create_account_with_keys(conn: &Connection, account: WalletAccount, id: usize) -> std::io::Result<()> {
+pub fn create_account_with_keys(conn: &Connection, account: WalletAccount, id: usize) -> std::io::Result<()> {    
     let seed = match account.seed {
         Some(s) => {
             let mnemonic = <Mnemonic<English>>::from_entropy(s).expect("Invalid seed entropy");
